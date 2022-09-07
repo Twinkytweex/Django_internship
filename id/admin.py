@@ -1,9 +1,16 @@
 from django.contrib import admin
-from id.models import Id
+from id.models import Id, Department, PersonalTraits, Arival_time
 from django.utils.html import format_html
 
+admin.site.register(Department)
+admin.site.register(PersonalTraits)
+admin.site.register(Arival_time)
 
-@admin.register(Id)
+
+@admin.register(
+    Id,
+)
+
 class Model1Admin(admin.ModelAdmin):
     def image_tag(self, obj):
         return format_html('<img src="{}" />'.format(obj.image.url))
