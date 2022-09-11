@@ -7,9 +7,15 @@ class Department(models.Model):
     name = models.CharField(
         max_length=50,
     )
+    parent_department = models.ForeignKey(
+        "self", on_delete=models.CASCADE, null=True, blank=True, verbose_name=" უფროსი"
+    )
 
     def __str__(self):
-        return self.name
+        if self.parent_department:
+            return str(self.name + " / " + str(self.parent_department))
+        else:
+            return self.name
 
 
 class PersonalTraits(models.Model):
@@ -93,13 +99,9 @@ class Id(models.Model):
     date_of_birth = models.DateField(verbose_name=(" დაბადების თარიღი"))
     validit_period = models.DateField(verbose_name=(" გაუქმების თარიღი"))
 
-    dep = models.ForeignKey(
-        Department,
-        on_delete=models.CASCADE,
-        related_name="dep"
-    )
+    dep = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="dep")
 
-    person = models.ManyToManyField(PersonalTraits,related_name="pers")
+    person = models.ManyToManyField(PersonalTraits, related_name="pers")
 
     def __str__(self):
         return self.first_name
@@ -114,17 +116,18 @@ class Id(models.Model):
 
 
 class Arival_time(models.Model):
-    name = models.CharField(max_length=50)
-    check_in = models.TimeField(null=True)
-    comment = models.TextField(max_length=500, null=True, blank=True)
-    check_out = models.TimeField(null=True)
-
+    name = models.CharField(
+        verbose_name=" სახელი", max_length=20, blank=True, null=True
+    )
     person_number = models.ForeignKey(
         Id,
         default=None,
         on_delete=models.CASCADE,
         related_name=("+"),
     )
+    comment = models.TextField(max_length=500, null=True, blank=True)
+    check_in = models.TimeField(null=True)
+    check_out = models.TimeField(null=True)
 
     def __str__(self):
         return self.name
