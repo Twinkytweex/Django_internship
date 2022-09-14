@@ -1,14 +1,54 @@
-from urllib import response
 from django.shortcuts import render
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from .models import *
 from django.http import JsonResponse
-from django.core import serializers
-from django.forms.models import model_to_dict
+from django.http import HttpResponse
+from django.template.loader import get_template
+from django.views.generic import View
+from io import BytesIO
+from xhtml2pdf import pisa
+from django.template.loader import render_to_string
+from django import template
+from django.template import loader
 
-
+# json
 def json(request):
-    data = list(Id.objects.values())
+    personids = list(Id.objects.values())
+    arrivaltimes = list(Arival_time.objects.values())
+    return JsonResponse(
+        {"personids": personids, "arrivaltimes": arrivaltimes}, safe=False
+    )
 
-    return JsonResponse(data, safe=False)
+
+# Generator pdf
+# def render_to_pdf(template_src, context_dict={}):
+#     template = get_template(template_src)
+#     html = template.render(context_dict)
+#     result = BytesIO()
+#     pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+#     if not pdf.err:
+#         return HttpResponse(result.getvalue(), content_type="application/pdf")
+#     return None
+
+
+# wokring on html and pdf
+def GeneratePdf(request):
+    products = Id.objects.all()
+    context = {"products": products}
+    return render(request, "base.html", context)
+
+
+def pdf_report_create(request):
+    products = Id.objects.all()
+
+    template_path = "pdfcreate.html"
+    context = {"products": products}
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = 'filename="products_report.pdf"'
+    template = get_template(template_path)
+    html = template.render(context)
+    # create a pdf
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    # if error then show some funy view
+    if pisa_status.err:
+        return HttpResponse("We had some errors <pre>" + html + "</pre>")
+    return response
