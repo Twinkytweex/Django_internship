@@ -19,7 +19,9 @@ class Department(models.Model):
 
 
 class PersonalTraits(models.Model):
-    person = models.CharField(max_length=30)
+    person = models.CharField(
+        max_length=30,
+    )
 
     def __str__(self):
         return self.person
@@ -34,13 +36,13 @@ class Id(models.Model):
         ("Zestafoni", "ზესტაფონი"),
     )
     orientation = (
-        ("კაცი", "კაცი"),
-        ("ქალი", "ქალი"),
-        ("არ მინდა დასახელება", "არ მინდა დასახელება"),
+        ("Men", "კაცი"),
+        ("Women", "ქალი"),
+        ("Dont wanna say", "არ მინდა დასახელება"),
     )
     citizenship = (
-        ("საქართველო", "საქართველო"),
-        ("უცხო ქვეყნის მოქალაქე", "უცხო ქვეყნის მოქალაქე"),
+        ("Georgia", "საქართველო"),
+        ("Foreign country", "უცხო ქვეყნის მოქალაქე"),
     )
 
     ### Persons Information
@@ -101,7 +103,9 @@ class Id(models.Model):
 
     dep = models.ForeignKey(Department, on_delete=models.CASCADE, related_name="dep")
 
-    person = models.ManyToManyField(PersonalTraits, related_name="pers")
+    # person = models.ManyToManyField(
+    #     PersonalTraits, blank=True, null=True, related_name="pers"
+    # )
 
     def __str__(self):
         return self.first_name
@@ -123,7 +127,7 @@ class Arival_time(models.Model):
         Id,
         default=None,
         on_delete=models.CASCADE,
-        related_name=("+"),
+        related_name="ids",
     )
     comment = models.TextField(max_length=500, null=True, blank=True)
     check_in = models.TimeField(null=True)
